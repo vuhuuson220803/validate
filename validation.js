@@ -1,5 +1,5 @@
   //dối tượng
-function Validator(options){
+  function Validator(options){
     function getParent(element,selector) {
         while(element.parentElement){
             if(element.parentElement.matches(selector)){
@@ -24,23 +24,21 @@ function Validator(options){
         // lặp qua các rules và kt
         // có lỗi dừng
         for(var i=0;i,rules.length;i++){
-           
-            if(errorMesssage) break;
-        }
-         if(errorMesssage ){
             switch(inputElement.type){
                 case 'radio':
                 case 'checkbox':
                     errorMesssage=rules[i](
-                        document.querySelector(rule.selector+':checked'),
+                        formElement.querySelector(rule.selector+':checked'),
                     );
                     break;
                 default:
                     errorMesssage=rules[i](inputElement.value);
-                        
-                
-
             }
+            if(errorMesssage) break ;
+           
+        }
+        
+         if(errorMesssage ){
           errorElement.innerText = errorMesssage;
           getParent(inputElement,options.formGroupSelector).classList.add('invalid');
          } else{
@@ -60,8 +58,9 @@ function Validator(options){
 
             //thực hiện lặp qua các rules và validate
             options.rules.forEach(function(rule){
-                var inputElement=formElement.querySelector(rule.selector)
-                 var isValid =validate(inputElement,rule);
+                var inputElement=formElement.querySelector(rule.selector);
+                 
+                var isValid =validate(inputElement,rule);
                if(!isValid){
                 isFormValid=false;
                }
@@ -97,10 +96,10 @@ function Validator(options){
                 selectorRules[rule.selector] =[rule.test];
 
             }
-                var inputElement=formElement.querySelector(rule.selector);
+                var inputElements =formElement.querySelectorAll(rule.selector);
                 
-                if(inputElement ){
-                    // xử lý blur ra khỏi input
+                Array.form(inputElements).forEach(function(inputElement){
+                        // xử lý blur ra khỏi input
                     inputElement.onblur = function(){
                        validate(inputElement,rule);
                     }
@@ -109,9 +108,10 @@ function Validator(options){
                         var errorElement=getParent(inputElement,options.formGroupSelector).querySelector(options.erorrSelector);
                         errorElement.innerText='';
                         getParent(inputElement,options.formGroupSelector).classList.remove('invalid');
-
+    
                     }
-                }
+                
+                });        
         });
     }
 }
@@ -123,7 +123,7 @@ Validator.isRequired = function(selector,message){
        return{
         selector: selector,
         test:function(value){
-            return value.trim() ? undefined :message ||'Vui Lòng Nhập Trường Này!!!'
+            return value ? undefined :message ||'Vui Lòng Nhập Trường Này!!!'
 
 
         }
