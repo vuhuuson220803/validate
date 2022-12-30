@@ -23,7 +23,7 @@
 
         // lặp qua các rules và kt
         // có lỗi dừng
-        for(var i=0;i,rules.length;i++){
+        for(var i=0;i<rules.length;i++){
             switch(inputElement.type){
                 case 'radio':
                 case 'checkbox':
@@ -63,26 +63,41 @@
                 var isValid =validate(inputElement,rule);
                if(!isValid){
                 isFormValid=false;
-               }
-            });
+              
+            }
+           
+        });
             
 
             if(isFormValid){
+                // submit vs js
              if(typeof  options.onSubmit==='function'){
 
-                 var enableInput=formElement.querySelectorAll('[name]:not([disable]')
+                 var enableInput=formElement.querySelectorAll('[name]')
                 
                 var formValues=Array.from(enableInput).reduce(function(values,input){
-                    values[input.name]=input.value;
+                   switch(input.type){
+                    case 'radio':
+                    case 'checkbox':
+                       values[input.name]=formElement.querySelector('input[name="'+input.name+'"]');
+                       break;
+                    default:
+                        values[input.name]=input.value;
+                   }
                     return  values;
-                
                 },{});
             
                 options.onSubmit(formValues);
+                
 
-                  }
+
+                
             }
+           
         }
+       
+    }
+
 
 
 
@@ -98,7 +113,7 @@
             }
                 var inputElements =formElement.querySelectorAll(rule.selector);
                 
-                Array.form(inputElements).forEach(function(inputElement){
+                Array.from(inputElements).forEach(function(inputElement){
                         // xử lý blur ra khỏi input
                     inputElement.onblur = function(){
                        validate(inputElement,rule);
@@ -113,6 +128,7 @@
                 
                 });        
         });
+       
     }
 }
 // Định nghĩa rules
@@ -151,7 +167,7 @@ Validator.isConfirmed=function(selector,getConfirmValue,message) {
     return{
         selector: selector,
         test:function(value){
-            return value === getConfirmValue?undefined : message ||'Giá trị nhập vào không chính xác!!!'
+            return value === getConfirmValue()?undefined : message ||'Giá trị nhập vào không chính xác!!!'
         }
     }
 
